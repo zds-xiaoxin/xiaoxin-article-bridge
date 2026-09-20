@@ -1,0 +1,80 @@
+{
+  "manifest_version": 3,
+  "name": "Xiaoxin Article Bridge",
+  "description": "Import Markdown and local images into X Articles drafts. Check missing assets and preserve existing titles and covers.",
+  "version": "1.0.0",
+  "homepage_url": "https://github.com/labixiaoxins/xiaoxin-article-bridge",
+  "default_locale": "en",
+  "minimum_chrome_version": "116",
+  "action": {
+    "default_title": "__MSG_action_title__",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    },
+    "default_popup": "diagnostics.html"
+  },
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "src/shared.js",
+        "src/content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "src/main-world.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN",
+      "all_frames": false
+    }
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "tabs"
+  ],
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/i18n.js",
+        "src/shared.js",
+        "fixtures/live-x-smoke.md"
+      ],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ]
+    }
+  ]
+}
