@@ -522,6 +522,8 @@
   function findSpecialBlocks(markdown, options = {}) {
     const spans = [];
     let match;
+    const inlineCode = [...markdown.matchAll(/(`+)([^\n]*?)\1(?!`)/g)]
+      .map((item) => ({ start: item.index, end: item.index + item[0].length }));
 
     spans.push(...findFencedCodeSpans(markdown));
     for (const span of findIndentedCodeSpans(markdown)) {
@@ -561,7 +563,7 @@
     }
 
     for (const image of findMarkdownImageSpans(markdown)) {
-      if (overlaps(spans, image.start)) continue;
+      if (overlaps(spans, image.start) || overlaps(inlineCode, image.start) || isEscaped(markdown, image.start)) continue;
       const source = image.source;
       const tweet = source.match(
         /^https?:\/\/(?:www\.)?(?:x\.com|twitter\.com)\/[A-Za-z0-9_]+\/status\/(\d+)/
@@ -589,17 +591,45 @@
       });
     }
 
-    const obsidianImage = /^[ \t]*!\[\[([^\]]+)\]\][ \t]*$/gm;
+    // Obsidian embeds: any embed alone on its line, or an inline embed that names an image file.
+    const obsidianImage = /!\[\[([^\]\n]+)\]\]/g;
     while ((match = obsidianImage.exec(markdown)) !== null) {
-      if (overlaps(spans, match.index)) continue;
+      const lineStart = markdown.lastIndexOf("\n", match.index - 1) + 1;
+      const newline = markdown.indexOf("\n", match.index);
+      const lineEnd = newline < 0 ? markdown.length : newline;
+      const matchEnd = match.index + match[0].length;
+      const ownLine = !markdown.slice(lineStart, match.index).trim() && !markdown.slice(matchEnd, lineEnd).trim();
+      const start = ownLine ? lineStart : match.index;
+      if (overlaps(spans, start) || overlaps(inlineCode, match.index) || isEscaped(markdown, match.index)) continue;
+      if (!ownLine && !/\.(?:png|jpe?g|webp|gif|avif|bmp|svg)[ \t]*(?:\|[^\]]*)?$/i.test(match[1])) continue;
       spans.push({
-        start: match.index,
-        end: match.index + match[0].length,
+        start,
+        end: ownLine ? lineEnd : matchEnd,
         segment: { type: "image", source: match[1].trim(), alt: "" }
       });
     }
 
     return spans.sort((left, right) => left.start - right.start);
+  }
+
+  // Materialize only the image spans recognised by the writer's parser. Code, tables,
+  // escaped examples and ordinary prose remain byte-for-byte intact.
+  function mapMarkdownImageSources(markdown, mapper) {
+    const header = String(markdown).match(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/)?.[0] || '';
+    let body = String(markdown).slice(header.length);
+    const images = findSpecialBlocks(body).filter((span) => span.segment.type === 'image');
+    for (const span of images.reverse()) {
+      const replacement = mapper(span.segment.source);
+      if (!replacement) continue;
+      const original = body.slice(span.start, span.end);
+      const standard = findMarkdownImageSpans(original)[0];
+      const rewritten = standard
+        ? original.slice(0, standard.start) + original.slice(standard.start, standard.end).replace(
+          /\]\([\s\S]*\)$/, `](${replacement})`) + original.slice(standard.end)
+        : original.replace(/!\[\[[^\]\n]+\]\]/, `![](${replacement})`);
+      body = body.slice(0, span.start) + rewritten + body.slice(span.end);
+    }
+    return header + body;
   }
 
   function findFencedCodeSpans(markdown) {
@@ -1092,8 +1122,7 @@
           continue;
         }
         flushList();
-        const tag = BLOCK_TAGS[segment.kind] || "p";
-        html.push(`<${tag}>${rendered}</${tag}>`);
+        html.push(renderTextBlockHtml(segment));
         continue;
       }
 
@@ -1205,7 +1234,7 @@
     return `![${alt}](${source})`;
   }
 
-  function renderInlineHtml(segment) {
+  function renderInlineHtml(segment, { interactiveLinks = true } = {}) {
     const text = segment.text || "";
     const openAt = new Array(text.length + 1).fill(null).map(() => []);
     const closeAt = new Array(text.length + 1).fill(null).map(() => []);
@@ -1219,8 +1248,8 @@
 
     for (const link of segment.links || []) {
       const href = escapeHtml(link.url);
-      openAt[link.offset]?.push(`<a href="${href}">`);
-      closeAt[link.offset + link.length]?.unshift("</a>");
+      openAt[link.offset]?.push(interactiveLinks ? `<a href="${href}">` : `<span class="pv-link" title="${href}">`);
+      closeAt[link.offset + link.length]?.unshift(interactiveLinks ? "</a>" : "</span>");
     }
 
     let output = "";
@@ -1231,6 +1260,11 @@
     }
     output += closeAt[text.length].join("");
     return output;
+  }
+
+  function renderTextBlockHtml(segment, options) {
+    const tag = BLOCK_TAGS[segment.kind] || 'p';
+    return `<${tag}>${renderInlineHtml(segment, options) || '<br>'}</${tag}>`;
   }
 
   function blocksToPlainText(blocks) {
@@ -1635,6 +1669,9 @@
   const api = {
     looksLikeMarkdown,
     parseMarkdown,
+    mapMarkdownImageSources,
+    renderInlineHtml,
+    renderTextBlockHtml,
     markdownTitleCandidate,
     markdownTitleCandidateFromFileName,
     segmentCounts,

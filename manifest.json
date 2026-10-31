@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Xiaoxin Article Bridge",
-  "description": "Import Markdown and local images into X Articles drafts. Check missing assets and preserve existing titles and covers.",
-  "version": "1.0.0",
+  "description": "Import Markdown folders and local images into X Articles drafts. Check, compress and preview first; never auto-publishes.",
+  "version": "1.1.0",
   "homepage_url": "https://github.com/labixiaoxins/xiaoxin-article-bridge",
   "default_locale": "en",
   "minimum_chrome_version": "116",

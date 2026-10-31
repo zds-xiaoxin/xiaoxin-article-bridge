@@ -131,6 +131,7 @@
   let importCancelRequested = false;
   let uploadRetryRequested = false;
   let localBundle = null;
+  let bridgePanel = null;
   let importOptions = { setTitle: false, setCover: false, smartPunctuation: false };
   let successFeedbackOptions = { confetti: true, sound: true, soundStyle: "soft" };
   let articleExportOptions = { enabled: true, mode: "copy" };
@@ -722,6 +723,7 @@
 
   function handleDraftEditorInput({ pasted = false, event = null } = {}) {
     activeDraftSourceFileName = "";
+    bridgePanel?.markStale();
     syncProgrammaticUndoFallback(event, els.markdown);
     clearProgrammaticHistoryOnTextInput(event, els.markdown);
     renderDraftSyntaxHighlight();
@@ -843,6 +845,7 @@
   function applyImportOptions(options = importOptions, { refresh = true } = {}) {
     importOptions = normalizeImportOptions(options);
     syncImportOptionsControls();
+    bridgePanel?.optionsChanged();
     if (!refresh) return;
     if (latestParsed?.segments?.length) analyzeDraft();
     else if (draftText().trim()) scheduleAnalyzeDraft(STARTUP_DRAFT_ANALYZE_DELAY_MS);
@@ -1164,6 +1167,7 @@
     document.documentElement.lang = i18n?.htmlLang?.(currentLanguage) || (currentLanguage === "zh" ? "zh-CN" : "en");
     setDatasetValueIfChanged(document.body, "language", currentLanguage);
     setDatasetValueIfChanged(document.body, "languagePreference", i18n?.preference?.() || currentLanguage);
+    bridgePanel?.render();
   }
 
   function translateDynamicDom(root = document.body, { syncEnvironment = true } = {}) {
@@ -6020,6 +6024,20 @@
         retryAfterChoose: () => importMarkdownDraft(markdownInput, { queueItemId, batch, sourceFileName })
       });
     }
+    // Validate/materialize the local package before any X draft creation or remote image request.
+    let uploadMarkdown = markdown;
+    if (localBundle) {
+      try {
+        if (!await bridgePanel.runCheck()) throw new Error('Check the article folder and fix the reported images before writing.');
+        uploadMarkdown = await window.xiaoxinBundle.inlineMedia(markdown, localBundle, shared, readBundleImage, importOptionsPayload());
+      } catch (error) {
+        log(`Local package check failed: ${error.message}`);
+        updateWriteButton();
+        activeWriteQueueItemId = null;
+        resetQueueItemWritingState(queueItemId);
+        return { ok: false, error: error.message };
+      }
+    }
     const remoteImages = remoteHttpImageSegments(parsed);
     if (remoteImages.length) {
       const permission = await requestRemoteImageAccess(parsed);
@@ -6080,17 +6098,6 @@
       persistDraftQueue();
       renderDraftQueue();
     }
-    let uploadMarkdown = markdown;
-    try {
-      if (localBundle) uploadMarkdown = await window.xiaoxinBundle.inlineMedia(markdown, localBundle, shared, readBundleImage, importOptionsPayload());
-    } catch (error) {
-      log(`Local package check failed: ${error.message}`);
-      recordLiveProgressEvent("error", { error: error.message });
-      updateWriteButton();
-      activeWriteQueueItemId = null;
-      resetQueueItemWritingState(queueItemId);
-      return { ok: false, error: error.message };
-    }
     const response = await sendToTargetTab({
       type: "xposter:import-markdown",
       markdown: uploadMarkdown,
@@ -6107,6 +6114,7 @@
       if (warnings) log(`Writing complete in ${seconds}s with ${warnings} media warning(s).`);
       if (latestProgress.state !== "complete") recordLiveProgressEvent("complete", { summary: response.summary });
       renderRunSummary(response.summary);
+      if (localBundle) bridgePanel?.markWritten();
       captureEvidence("import", { result: response, targetContext: target.targetContext, pageStatus: latestPageStatus, diagnostics: latestDiagnostics });
       markActiveQueueItemWritten();
       if (!batch || draftQueue.length === 0) {
@@ -6464,43 +6472,38 @@
     input.click();
   }
 
-  function readBundleImage(file) {
+  function readBundleImage(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error(`Could not read ${file.name}`));
-      reader.readAsDataURL(file);
+      reader.onerror = () => reject(new Error(`Could not read ${blob.name || "compressed image"}`));
+      reader.readAsDataURL(blob);
     });
   }
 
-  document.getElementById("loadBundle")?.addEventListener("click", () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.webkitdirectory = true;
-    input.addEventListener("change", async () => {
-      if (!input.files?.length) return;
-      const report = document.getElementById("bundleReport");
-      const output = document.getElementById("bundleReportText");
-      report.hidden = false;
-      report.open = true;
-      try {
-        if (queueModeActive()) throw new Error("Exit the multi-draft queue before importing one article folder.");
-        const candidate = window.xiaoxinBundle.createBundle([...input.files]);
-        if (candidate.file.size > 512 * 1024) throw new Error("Markdown exceeds 512 KiB.");
-        const text = await candidate.file.text();
-        const parsed = shared.parseMarkdown(text);
-        const check = window.xiaoxinBundle.inspect(candidate, parsed, shared);
-        output.textContent = check.rows.map((r) => `${r.status} | ${r.role} | ${r.source}`).join("\n") +
-          `\n${check.rows.length} references, ${(check.bytes / 1048576).toFixed(1)} MiB. Local check only; not uploaded.`;
-        if (!check.ok) throw new Error("Fix missing/unsupported images or reduce the package below 24 MiB.");
-        localBundle = candidate;
-        await setImportOptions({ setTitle: false, setCover: false, allowGraphqlMetadata: false });
-        setSingleDraftMarkdown(text, { fileName: candidate.entry, source: "folder", statusTitle: "Markdown loaded" });
-      } catch (error) {
-        output.textContent += `\nERROR: ${error.message}`;
-      }
-    });
-    input.click();
+  function clearLocalBundle() {
+    localBundle = null;
+    bridgePanel?.reset();
+  }
+
+  // v1.1 article-folder card: folder memory, local compression and preview (src/xiaoxin-bridge-panel.js).
+  bridgePanel = window.xiaoxinBridgePanel?.createBridgePanel({
+    shared,
+    bundleApi: window.xiaoxinBundle,
+    imageApi: window.xiaoxinImage,
+    memory: window.xiaoxinFolderMemory,
+    preview: window.xiaoxinPreview,
+    queueModeActive,
+    getMarkdown: () => draftText(),
+    setMarkdown: (text, fileName) => setSingleDraftMarkdown(text, { fileName, source: "folder", statusTitle: "Markdown loaded" }),
+    setBundle: (bundle) => { localBundle = bundle; },
+    getImportOptions: () => activeDraftParseOptions(),
+    setImportOptions: (next) => setImportOptions({ ...importOptions, ...next }),
+    focusWrite: () => {
+      const button = document.getElementById("importDraft");
+      button?.scrollIntoView({ block: "center", behavior: "smooth" });
+      button?.focus({ preventScroll: true });
+    }
   });
 
   async function loadMarkdownFiles(markdownFiles, source) {
@@ -6517,8 +6520,7 @@
 
   async function queueMarkdownFiles(markdownFiles, source) {
     const items = await filesToQueueItems(markdownFiles);
-    localBundle = null;
-    document.getElementById("bundleReport").hidden = true;
+    clearLocalBundle();
     const added = addDraftQueueItems(items, {
       activateFirst: true,
       source
@@ -6541,8 +6543,7 @@
     try {
       setDraftDropStatus("Reading file...", file.name, "ready");
       const text = await file.text();
-      localBundle = null;
-      document.getElementById("bundleReport").hidden = true;
+      clearLocalBundle();
       if (queueModeActive()) {
         const item = addDraftToQueue(text, {
           fileName: file.name,

@@ -1,15 +1,59 @@
 # Release verification
 
-Date: 2026-09-21. Candidate: 1.0.0.
+## 1.1.0 local candidate — 2026-10-31
 
-- npm run verify: passed (upstream syntax/i18n/smoke tests and 12 bundle tests).
-- Independent Chrome for Testing profile: extension loaded successfully.
-- Selected public fixtures/bundle using the browser file chooser: nine body references plus cover ready, no page runtime errors.
-- Existing-title and existing-cover replacement: unchecked by default.
-- All HTTP requests blocked in the browser test. No authenticated X interaction tested here.
-- Screenshot: images/local-bundle.png (public synthetic data only).
-- Store submission: not performed, owner has no developer account yet.
+Status: implemented and verified locally. No push, GitHub Release, store registration/payment/submission, or authenticated X draft write was performed in this work.
 
-The upstream branding/docs assertions were updated to check this fork's identity and attribution; functional upstream checks remain enabled. The source package excludes local profiles, customer files, credentials and private-article screenshots. A targeted string/credential-pattern scan found no matches; this is not a comprehensive security audit.
+- `npm run verify`: passed. Syntax, JSON/i18n and upstream smoke checks plus **36 unit tests** (12 bundle + 24 v1.1 tests).
+- `npm run test:browser`: passed in a fresh, disposable **Chrome for Testing 151.0.7922.34** profile. The extension is loaded unpacked; the normal Chrome profile is not used. All external HTTP(S) requests are blocked.
+- Real disk directory selection through the browser file chooser: `fixtures/bundle` → check → preview passed. Nine body images and one table render. Title and cover replacement remain off by default.
+- Automated handle persistence uses real OPFS directory handles with a substituted picker response; this is distinct from native-picker verification below. Closing/reopening the panel restores its IndexedDB handle and the continue button works.
+- `node scripts/test-native-folder.cjs`: passed separately in a headed isolated Chrome. The **actual system directory picker**, without substitution, selected `fixtures/bundle`. Ten references checked, nine body images and the writer-rendered table PNG previewed. After a full browser close/restart, the stored handle remained; “Continue last folder” showed Chrome's actual read-access prompt, permission was granted, and the check passed again.
+- Obsidian own-line/inline embeds and width hints passed. Image-like inline/fenced code, escaped examples and table cells stay literal during materialization. Ambiguous duplicate filenames fail rather than guessing.
+- Actual local JPEG compression: synthetic random-pixel PNG **17.1 MiB → 4.1 MiB**. Actual WebP compression of a transparent sample kept its 256×128 ratio and alpha channel while reducing bytes. Original fixture files are unchanged.
+- Missing-image and unused-cover paths passed. Editing invalidates the old preview. The card and Settings metadata controls stay synchronized. Preview and writing share the parser, text renderers and table-to-PNG function.
+- 320, 360 and 420 CSS-pixel sidebars have no document horizontal overflow. Light/dark screenshots inspected. Reduced-motion mode remains visibly rendered (a previously inherited opacity bug was fixed).
+- Both browser runs reported **zero page runtime errors**. This is not a claim of universal X compatibility or store acceptance.
 
-Known limits: folder selection is session-only; unsupported Markdown image syntax can fail closed; output styling follows X rather than arbitrary HTML; future X editor changes may require maintenance. Local validation is not proof of successful upload.
+### Reproduce
+
+Node.js 22 and jq are used for `npm run verify`. Browser checks need an existing Playwright installation and its Chrome for Testing binary. Either resolve `playwright` normally or set `PLAYWRIGHT_MODULE` to its absolute module path; this work reused the installed environment without adding dependencies to the repository.
+
+```sh
+npm run verify
+npm run test:browser
+# Interactive desktop check: choose fixtures/bundle and allow its read-access prompt.
+node scripts/test-native-folder.cjs
+npm run package
+```
+
+The native check closes its own isolated browser and removes only its disposable test profile. It does not use everyday Chrome login data.
+
+### Evidence and artifacts
+
+- Automated receipt: `output/playwright/result.json`; native receipt: `output/playwright/native-result.json`.
+- Static/unit log: `output/verify-v1.1.log`; browser log: `output/browser-v1.1.log`.
+- Store screenshot drafts: `dist/store-assets/screenshot-{1-check,2-preview,3-table}-1280x800.png` (actual browser captures; public fixtures only). Review before submitting.
+- Store/upload package: `dist/xiaoxin-article-bridge-1.1.0.zip`; LICENSE and THIRD_PARTY_NOTICES are included. Local test profiles, logs, screenshots and website material are excluded.
+- Website experiment assets: `个人网站/research/05-文章桥改造素材/` in the parent 自媒体 workspace. Its README describes before/after, image sources and the live-X acceptance gap. The before image was recovered from the existing v1.0 capture `output/playwright/local-bundle.png`; no stash or worktree was needed.
+
+### 小新本人验证真实 X 草稿
+
+1. Keep an article backup. In your Chrome, disable other xPoster variants, then load this repository or the extracted 1.1.0 ZIP with **Load unpacked**. Do not clear your existing Chrome/extension data.
+2. Sign in to X yourself with an account that has X Articles access. Create a disposable test draft and set a recognizable title and cover.
+3. Select this repository's public `fixtures/bundle` folder. Check the image list, click Preview, and leave both replacement options **unchecked**.
+4. Click **Write to X draft**. Confirm all nine body images and the table are present and in order, and that the pre-existing title and cover are unchanged. Do not publish the test article.
+5. In a separate disposable draft, explicitly enable title/cover replacement, preview again, and confirm the result on X. Real-X support for these metadata operations still needs this owner check.
+6. Close/reopen the sidebar and continue the last folder; if Chrome asks, grant read permission. For a large-image check, use a disposable public copy, confirm before/after sizes, and check its final appearance in the X draft.
+
+Passing local validation, a screenshot or a click is not proof that X saved/uploaded the draft. Record the actual draft result before calling 1.1 accepted for live use.
+
+## Historical 1.0.0 verification — 2026-09-21
+
+- `npm run verify`: passed (upstream syntax/i18n/smoke checks and 12 bundle tests).
+- Independent Chrome for Testing profile loaded the extension successfully.
+- The browser file chooser selected public `fixtures/bundle`: nine body references plus cover ready, no runtime errors, title/cover replacement off.
+- HTTP requests blocked; authenticated X interaction not tested in that run.
+- Screenshot: `images/local-bundle.png` (public synthetic data). Store submission not performed.
+
+Original functional upstream checks remain enabled. Targeted package/content inspection does not constitute a comprehensive security audit. Future X editor changes may require maintenance; preview styling is approximate and remote images are not fetched during preview.

@@ -1,6 +1,6 @@
 {
   "name": "xiaoxin-article-bridge",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Chrome MV3 extension for importing Markdown drafts into X Articles.",
   "license": "MIT",
   "type": "commonjs",
@@ -13,8 +13,10 @@
     "publishing"
   ],
   "scripts": {
-    "check": "node --check src/background.js && node --check src/content.js && node --check src/main-world.js && node --check src/shared.js && node --check src/i18n.js && node --check src/sidepanel-config.js && node --check src/sidepanel-elements.js && node --check src/sidepanel-editor.js && node --check src/sidepanel-messages.js && node --check src/sidepanel-patterns.js && node --check sidepanel.js && node --check diagnostics.js && jq empty manifest.json && node scripts/check-i18n.js",
-    "test": "node scripts/smoke-test.js && node --test scripts/test-xiaoxin-bundle.js",
+    "check": "node --check src/background.js && node --check src/content.js && node --check src/main-world.js && node --check src/shared.js && node --check src/i18n.js && node --check src/sidepanel-config.js && node --check src/sidepanel-elements.js && node --check src/sidepanel-editor.js && node --check src/sidepanel-messages.js && node --check src/sidepanel-patterns.js && node --check src/xiaoxin-bundle.js && node --check src/xiaoxin-image.js && node --check src/xiaoxin-folder-memory.js && node --check src/xiaoxin-preview.js && node --check src/xiaoxin-bridge-panel.js && node --check sidepanel.js && node --check diagnostics.js && jq empty manifest.json && node scripts/check-i18n.js",
+    "test": "node scripts/smoke-test.js && node --test scripts/test-xiaoxin-bundle.js scripts/test-xiaoxin-v11.js",
+    "test:browser": "node scripts/test-local-extension.cjs",
+    "package": "node scripts/package-release.cjs",
     "verify": "npm run check && npm test"
   },
   "repository": {

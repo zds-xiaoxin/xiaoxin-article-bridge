@@ -1,11 +1,13 @@
 # Privacy Policy
 
-Product: Xiaoxin Article Bridge. Effective: 2026-09-21.
+Product: Xiaoxin Article Bridge. Effective: 2026-10-31 (version 1.1.0; previous version 2026-09-21).
 Maintainer: GitHub account labixiaoxins. Contact: https://github.com/labixiaoxins/xiaoxin-article-bridge/issues (do not post private data).
 
 ## Data and purpose
 
-The single purpose is importing user-selected Markdown and related media into X Articles drafts. The extension reads selected/pasted draft text, selected local files, relevant X/Twitter tab URLs and editor state. It stores draft text, settings, local import history and diagnostic records in Chrome extension local storage. The upstream folder workflow may store granted directory handles in IndexedDB; the new package-selection workflow holds selected file references in memory for the current sidebar session.
+The single purpose is importing user-selected Markdown and related media into X Articles drafts. The extension reads selected/pasted draft text, selected local files, relevant X/Twitter tab URLs and editor state. It stores draft text, settings, local import history and diagnostic records in Chrome extension local storage. The upstream folder workflow may store granted directory handles in IndexedDB. The article-folder workflow (1.1) stores one handle for the last chosen folder in the extension's IndexedDB so it can be reopened; this is a browser-managed reference, not a copy of the files, and Chrome controls whether read access is still granted. Use “Forget” on the article card, or remove the extension's local data, to delete it. Selected file references, locally compressed image copies and preview images are held in memory for the current side-panel session only and are discarded when the panel closes.
+
+Image compression and the preview run entirely in the side panel. The preview shows local images only and does not request remote images.
 
 The extension uses the browser's existing X session to interact with the editor and related X requests. It does not ask for an X password or send authentication information to the developer. Locally displayed diagnostic records may contain draft text, URLs and errors; inspect and redact any exported report before sharing.
 
@@ -17,7 +19,7 @@ No developer-operated content server, advertising, data sale or analytics is inc
 
 ## Retention and control
 
-Local records remain until cleared using available extension controls or the extension's local data is removed. Export anything you need before removing the extension. Removing it does not delete content already saved on X. Close the sidebar to release the package-selection session. Revoke optional site access in Chrome's extension settings. Do not import materials you are not permitted to share with X.
+Local records remain until cleared using available extension controls or the extension's local data is removed. Export anything you need before removing the extension. Removing it does not delete content already saved on X. Close the sidebar to release the package-selection session and in-memory compressed copies; use “Forget” to delete the remembered folder handle. Revoke optional site access in Chrome's extension settings. Do not import materials you are not permitted to share with X.
 
 ## Permissions
 

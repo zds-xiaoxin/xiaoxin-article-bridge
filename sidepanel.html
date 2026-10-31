@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Xiaoxin Article Bridge</title>
     <link rel="stylesheet" href="sidepanel.css" />
+    <link rel="stylesheet" href="xiaoxin-theme.css" />
     <script src="src/i18n.js" defer></script>
     <script src="src/shared.js" defer></script>
     <script src="src/xiaoxin-bundle.js" defer></script>
+    <script src="src/xiaoxin-image.js" defer></script>
+    <script src="src/xiaoxin-folder-memory.js" defer></script>
+    <script src="src/xiaoxin-preview.js" defer></script>
+    <script src="src/xiaoxin-bridge-panel.js" defer></script>
     <script src="src/sidepanel-config.js" defer></script>
     <script src="src/sidepanel-elements.js" defer></script>
     <script src="src/sidepanel-editor.js" defer></script>
@@ -41,14 +46,50 @@
         <div class="composer-head">
           <span class="composer-title" data-i18n="Markdown draft">Markdown draft</span>
           <div class="toolbar">
-            <button class="secondary compact" id="loadBundle" type="button">导入文章文件夹</button>
             <button class="icon-button" id="loadFile" title="Choose .md file" aria-label="Choose .md file" data-i18n-title="Choose .md file" data-i18n-aria-label="Choose .md file">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm-1 2.5L17.5 9H13V4.5ZM8 13h3V9h2v4h3l-4 4-4-4Z"/></svg>
               <span data-i18n="Choose .md file">Choose .md file</span>
             </button>
           </div>
         </div>
-        <details id="bundleReport" hidden><summary>本地配图检查</summary><pre id="bundleReportText" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre></details>
+        <section class="xb-card" id="xbCard" aria-label="Article folder" data-busy="false">
+          <ol class="xb-steps" id="xbSteps" aria-label="Steps"></ol>
+          <div class="xb-actions">
+            <button class="xb-btn xb-btn-primary" id="loadBundle" type="button">Choose article folder</button>
+            <button class="xb-btn xb-resume" id="xbResume" type="button" hidden>
+              <span id="xbResumeLabel">Continue last folder</span>
+              <small id="xbResumeName"></small>
+            </button>
+            <button class="xb-text-btn" id="xbForget" type="button" hidden>Forget</button>
+          </div>
+          <p class="xb-hint" id="xbResumeHint" hidden></p>
+          <div class="xb-state" id="xbState" data-tone="empty" role="status" aria-live="polite">
+            <strong id="xbStateTitle"></strong>
+            <span id="xbStateBody"></span>
+          </div>
+          <div class="xb-check" id="xbCheck" hidden>
+            <p class="xb-summary" id="xbSummary"></p>
+            <ul class="xb-list" id="xbList"></ul>
+            <div class="xb-notes" id="xbNotes"></div>
+            <label class="xb-option"><input type="checkbox" id="xbReplaceTitle" /><span id="xbReplaceTitleLabel"></span></label>
+            <label class="xb-option"><input type="checkbox" id="xbReplaceCover" /><span id="xbReplaceCoverLabel"></span></label>
+            <div class="xb-row">
+              <button class="xb-btn" id="xbRecheck" type="button">Check again</button>
+              <button class="xb-btn xb-btn-primary" id="xbPreviewBtn" type="button" disabled>Preview</button>
+            </div>
+          </div>
+          <section class="xb-preview" id="xbPreview" hidden>
+            <header class="xb-preview-head">
+              <div>
+                <strong id="xbPreviewTitle"></strong>
+                <span id="xbPreviewNote"></span>
+              </div>
+              <button class="xb-text-btn" id="xbPreviewClose" type="button">Hide</button>
+            </header>
+            <article class="pv-article" id="xbPreviewBody"></article>
+            <div class="xb-row"><button class="xb-btn xb-btn-accent" id="xbGoWrite" type="button">Go to Write</button></div>
+          </section>
+        </section>
         <div class="drop-status" id="draftDropStatus" data-tone="idle" aria-live="polite">
           <strong data-i18n="Markdown draft">Markdown draft</strong>
           <span data-i18n="Paste Markdown here, choose a file, or drop .md files.">Paste Markdown here, choose a file, or drop .md files.</span>

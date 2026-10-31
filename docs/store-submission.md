@@ -1,18 +1,18 @@
 # Chrome Web Store submission packet
 
-Status: NOT SUBMITTED. Developer registration is not complete. This document is preparation, not evidence of approval. Reviewed against official documentation on 2026-09-21.
+Status: NOT SUBMITTED. Developer registration is not complete. This document is preparation, not evidence of approval. Reviewed against official documentation on 2026-09-21; image and privacy-tab requirements re-checked on 2026-10-31 for 1.1.0. Owner-facing Chinese checklist: [store-checklist.zh-CN.md](store-checklist.zh-CN.md).
 
 ## Identity and listing
 
 Name: Xiaoxin Article Bridge
 
-Short description: Import Markdown and local images into X Articles drafts. Check missing assets and preserve existing titles and covers.
+Short description: Import Markdown folders and local images into X Articles drafts. Check, compress and preview first; never auto-publishes.
 
 Category suggestion: Productivity / Tools (choose the closest available category in the dashboard).
 
 English description:
 
-Prepare your article outside X, then bring its Markdown and local images into an X Articles draft. Select a folder containing article.md and assets, review missing-file and file-size checks, and write when ready. Existing titles and covers are preserved by default. Inspect the target draft before publishing manually.
+Prepare your article outside X, then bring its Markdown and local images into an X Articles draft. Select a folder containing article.md and assets, review missing-file and file-size checks, let oversized images be compressed locally, preview an approximate X Articles layout, and write when ready. The last folder can be reopened with one click; Obsidian image embeds such as ![[image.png]] are supported. Existing titles and covers are preserved by default. Inspect the target draft before publishing manually.
 
 This independent, MIT-licensed xPoster fork focuses on local article packages. It supports suitable Markdown exported from Obsidian and other editors. It is not affiliated with X, Google, Obsidian or the original xPoster publisher. X Articles access is required and is controlled by X. This version does not provide AI image generation or an automatic Publish action.
 
@@ -20,9 +20,9 @@ Draft history and settings are stored locally. Writing transfers selected conten
 
 中文介绍：
 
-在 Obsidian 或其他 Markdown 编辑器里写好文章后，将文章与本地配图整包导入 X Articles 草稿。选择 article.md 和 assets 所在目录，先检查缺图、路径和文件大小，再执行写入。默认保留 X 中已有的标题和封面，导入后由你检查并手动发布。
+在 Obsidian 或其他 Markdown 编辑器里写好文章后，将文章与本地配图整包导入 X Articles 草稿。选择 article.md 和 assets 所在目录，先检查缺图、路径和文件大小，超大图片在本机自动压缩，预览近似 X 长文的效果，再执行写入。支持 Obsidian 的 ![[图片.png]] 写法，可一键继续上次的文件夹。默认保留 X 中已有的标题和封面，导入后由你检查并手动发布。
 
-本插件是 xPoster 的独立 MIT 开源分支，非 X、Google、Obsidian 官方产品。不提供 AI 生图、不自动发布、不需要 AI API Key。X 文章权限由 X 账号自身决定。目录选择仅当前侧栏会话有效，重启后需重新选择。
+本插件是 xPoster 的独立 MIT 开源分支，非 X、Google、Obsidian 官方产品。不提供 AI 生图、不自动发布、不需要 AI API Key。X 文章权限由 X 账号自身决定。上次选择的文件夹以浏览器目录句柄形式保存在本机，读取权限由 Chrome 控制。
 
 ## Single purpose
 
@@ -46,13 +46,13 @@ Homepage: https://github.com/labixiaoxins/xiaoxin-article-bridge
 
 ## Reviewer reproduction
 
-Load fixtures/bundle as the selected folder. Ten references should be found (nine body images plus cover), and title/cover replacement should be unchecked. This is a local preparation test. To test a real import, use the reviewer's own permitted X Articles account and verify the target draft. No developer credentials are supplied or required. Do not publish the test article.
+Load fixtures/bundle as the selected folder. Ten references should be found (nine body images plus cover), and title/cover replacement should be unchecked. Click Preview: nine body images and one table appear, with placeholders saying the existing title and cover are kept. This is a local preparation test. To test a real import, use the reviewer's own permitted X Articles account and verify the target draft. No developer credentials are supplied or required. Do not publish the test article.
 
 ## Remaining submission gates
 
 - Developer account registration, fee payment, email and two-step verification by the owner.
 - Confirm listing identity and any required regional trader/contact fields. Never invent those facts.
-- Distinctive final icon and required 440x280 promotional image review. Existing upstream icon must not be presented as new original artwork.
+- Distinctive final icon review. The 440x280 small promo tile is optional per the images page (items without it are shown after items that have one). Existing upstream icon must not be presented as new original artwork.
 - At least one accurate 1280x800 or 640x400 screenshot with only public sample content.
 - Privacy form confirmation against current dashboard categories.
 - ZIP upload, submission receipt and actual review outcome. Open-source permission does not guarantee store acceptance; a derivative still needs a clear useful difference and non-misleading listing.
