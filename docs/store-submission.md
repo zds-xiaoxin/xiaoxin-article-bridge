@@ -40,9 +40,9 @@ Import user-selected Markdown articles and associated local/remote images into X
 
 Do not tick “no data” just because there is no developer server. Website content includes draft text/media and editor state. Relevant tab URLs and interaction/diagnostic records are accessed/stored locally. Article content is transmitted to X at user request; remote hosts receive image requests. The existing authenticated X session is used. Confirm the live dashboard's current category definitions before submission and ensure choices match docs/privacy.md. Do not claim collection of unrelated history or passwords.
 
-Privacy URL after repository publication: https://github.com/labixiaoxins/xiaoxin-article-bridge/blob/main/docs/privacy.md
-Support: https://github.com/labixiaoxins/xiaoxin-article-bridge/issues
-Homepage: https://github.com/labixiaoxins/xiaoxin-article-bridge
+Privacy URL after repository publication: https://github.com/zds-xiaoxin/xiaoxin-article-bridge/blob/main/docs/privacy.md
+Support: https://github.com/zds-xiaoxin/xiaoxin-article-bridge/issues
+Homepage: https://github.com/zds-xiaoxin/xiaoxin-article-bridge
 
 ## Reviewer reproduction
 
@@ -52,7 +52,7 @@ Load fixtures/bundle as the selected folder. Ten references should be found (nin
 
 - Developer account registration, fee payment, email and two-step verification by the owner.
 - Confirm listing identity and any required regional trader/contact fields. Never invent those facts.
-- Distinctive final icon review. The 440x280 small promo tile is optional per the images page (items without it are shown after items that have one). Existing upstream icon must not be presented as new original artwork.
+- Distinctive final icon review. The 440x280 small promo tile is optional per the images page (items without it are shown after items that have one). New v1.2 artwork is in docs/brand/: store-icon-128.png (96px symbol with 16px transparent padding) and promotional-440x280.png. These still need owner review before store submission.
 - At least one accurate 1280x800 or 640x400 screenshot with only public sample content.
 - Privacy form confirmation against current dashboard categories.
 - ZIP upload, submission receipt and actual review outcome. Open-source permission does not guarantee store acceptance; a derivative still needs a clear useful difference and non-misleading listing.

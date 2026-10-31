@@ -1,7 +1,7 @@
 # Privacy Policy
 
-Product: Xiaoxin Article Bridge. Effective: 2026-10-31 (version 1.1.0; previous version 2026-09-21).
-Maintainer: GitHub account labixiaoxins. Contact: https://github.com/labixiaoxins/xiaoxin-article-bridge/issues (do not post private data).
+Product: Xiaoxin Article Bridge. Effective: 2026-11-01 (version 1.2.0; previous version 2026-10-31).
+Maintainer: GitHub account zds-xiaoxin. Contact: https://github.com/zds-xiaoxin/xiaoxin-article-bridge/issues (do not post private data).
 
 ## Data and purpose
 

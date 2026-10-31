@@ -1,6 +1,20 @@
 # Release verification
 
-## 1.1.0 local candidate — 2026-10-31
+## 1.2.0 local verification — 2026-11-01
+
+Status: local implementation verified; remote connectivity is blocked, so no push or GitHub Release is confirmed. No store submission or authenticated X draft write was performed.
+
+- `npm run verify`: passed, including syntax, JSON/i18n, upstream smoke and 36 unit tests.
+- `npm run test:browser`: passed in an isolated Chrome for Testing 151.0.7922.34 profile, with external HTTP blocked and zero page runtime errors. Existing Playwright/browser installations were reused.
+- Folder selection, OPFS handle persistence, actual local JPEG/WebP compression, transparency, preview, stale-preview invalidation and metadata-option synchronization still pass. The real native dialog/restart permission flow was previously verified for 1.1; it was not repeated for this visual release.
+- Light/dark × 320/360/420px × draft/records/settings/diagnostics: 24 layouts checked for document overflow and clipped button text. Theme settings propagate to diagnostics; both surfaces follow system appearance in system mode.
+- Final screenshots use public synthetic fixtures only. Icons and promotional artwork received a production-side visual check; owner visual acceptance and store submission remain separate.
+- Packaging explicitly enumerates production files and compares every archived byte with source. Audit is saved alongside the ZIP in `dist/`; tests, local profiles, output evidence and handoff notes are excluded.
+- Local logs: `output/verify-v1.2.log`, `output/browser-v1.2.log`; browser receipt: `output/playwright/result.json`. These are ignored and are not part of the release ZIP.
+
+Use the extracted **1.2.0 ZIP** for the owner-only real-X checklist below. Confirm all body images and the table are saved, default title/cover preservation works, explicit replacement works in a separate draft, and never publish the test article. Local checks do not prove X saved a draft.
+
+## Historical 1.1.0 local candidate — 2026-10-31
 
 Status: implemented and verified locally. No push, GitHub Release, store registration/payment/submission, or authenticated X draft write was performed in this work.
 

@@ -1,32 +1,8 @@
-/* Xiaoxin Article Bridge v1.1 theme ("小新指北"): warm paper, ink outlines, solid offset shadows.
-   Loaded after sidepanel.css; the inherited upstream stylesheet stays untouched. */
-
-:root:not([data-theme="dark"]) {
-  --paper: #fff7ec;
-  --paper-2: #fbecd8;
-  --ink: #2b2118;
-  --muted: #76655a;
-  --line: #e2cfb8;
-  --signal: #ff6b3d;
-  --signal-text: #c2461c;
-  --signal-ink: #2b2118;
-  --accent: #ff6b3d;
-  --ok: #2c8a57;
-  --warn: #b0600c;
-  --danger: #cf3424;
-  --button-fill: #2b2118;
-  --button-ink: #fff7ec;
-  --shadow: 4px 4px 0 #2b2118;
-}
-
+/* Xiaoxin v1.2 side panel. Shared identity tokens live in xiaoxin-brand.css. */
 :root {
   --xb-ink: var(--ink);
   --xb-accent: #ff6b3d;
   --xb-accent-soft: color-mix(in oklch, #ff6b3d, var(--paper) 86%);
-  --xb-radius: 14px;
-  --xb-border: 2px solid var(--ink);
-  --xb-shadow: 4px 4px 0 var(--ink);
-  --xb-shadow-sm: 2px 2px 0 var(--ink);
 }
 
 body {
@@ -42,16 +18,13 @@ body {
   letter-spacing: 0.02em;
 }
 
+.eyebrow { display: flex; align-items: center; gap: 8px; line-height: 1.3; }
 .eyebrow::before {
   content: "";
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  margin-right: 7px;
-  border: 2px solid var(--ink);
-  border-radius: 50%;
-  background: var(--xb-accent);
-  vertical-align: -1px;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  background: url("assets/icon-128.png") center / contain no-repeat;
 }
 
 .page-state {
@@ -110,7 +83,7 @@ body {
 
 .publish-dock {
   border-top: var(--xb-border);
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 18px 18px;
   background: var(--paper);
   box-shadow: none;
 }
@@ -120,7 +93,7 @@ body {
   border-radius: 12px;
   background: var(--button-fill);
   color: var(--button-ink);
-  box-shadow: 3px 3px 0 var(--xb-accent);
+  box-shadow: var(--xb-shadow-sm);
 }
 
 .primary:hover {
@@ -249,7 +222,7 @@ body {
 .xb-btn:disabled { cursor: not-allowed; opacity: 0.5; box-shadow: none; }
 .xb-btn-primary { background: var(--xb-accent); color: #2b2118; }
 .xb-btn-primary:hover:not(:disabled) { background: color-mix(in oklch, var(--xb-accent), #2b2118 10%); }
-.xb-btn-accent { background: var(--ink); color: var(--paper); box-shadow: 2px 2px 0 var(--xb-accent); }
+.xb-btn-accent { background: var(--ink); color: var(--paper); box-shadow: var(--xb-shadow-sm); }
 .xb-btn-accent:hover:not(:disabled) { background: color-mix(in oklch, var(--ink), var(--xb-accent) 20%); }
 
 .xb-resume {
@@ -311,7 +284,7 @@ body {
   width: 10px;
   height: 10px;
   margin-right: 8px;
-  border: 2px solid var(--ink);
+  border: var(--xb-border);
   border-right-color: transparent;
   border-radius: 50%;
   vertical-align: -1px;
@@ -539,3 +512,50 @@ body {
 .pv-table td { padding: 7px 10px; border: 1px solid #d8d2c6; text-align: left; overflow-wrap: anywhere; }
 .pv-table th { background: #eeece6; font-weight: 700; }
 .pv-table tbody tr:nth-child(even) td { background: #f6f3ec; }
+
+/* Keep the whole shell in the same warm palette, including inherited dark rules. */
+body, :root[data-theme="dark"] body { background: var(--paper); }
+:root[data-theme="dark"] :is(.composer, .records, .settings, .run-summary,
+  .record-history, .live-result, .live-runbook, .proof-deck, .completion-audit, .evidence) {
+  background: var(--paper);
+  box-shadow: var(--xb-shadow);
+}
+:root[data-theme="dark"] .tabs { background: var(--paper-2); }
+:root[data-theme="dark"] .tab.active { background: var(--paper); }
+:root[data-theme="dark"] :is(.draft-queue-item, .draft-queue-empty, .record-history-item,
+  .records-empty, .record-history-empty, .record-search input, .record-edit-dialog textarea,
+  .summary-message, .proof-path, .draft-queue) { background: var(--paper-2); }
+:root[data-theme="dark"] .record-history-item:hover,
+:root[data-theme="dark"] .draft-queue-item[data-active="true"] {
+  background: color-mix(in oklch, var(--signal), var(--paper) 90%);
+}
+:root[data-theme="dark"] .drop-status[data-tone="error"],
+:root[data-theme="dark"] .draft-media-alert {
+  background: color-mix(in oklch, var(--danger), var(--paper) 90%);
+}
+.tabs { border-radius: 14px; }
+.primary, .secondary, .xb-btn { border-radius: 12px; }
+.primary:active:not(:disabled), .xb-btn:active:not(:disabled) {
+  transform: translateY(3px); box-shadow: none;
+}
+.xb-btn-accent { background: var(--xb-accent); color: #2b2118; }
+.xb-btn-accent:hover:not(:disabled) { background: #ff825c; }
+.xb-state[data-tone="done"] strong { color: var(--ok); }
+.xb-summary[data-tone="ok"] { color: var(--ok); }
+.xb-summary[data-tone="warn"] { color: var(--warn); }
+.xb-step-dot { border-color: var(--xb-outline); }
+.xb-steps li[data-status="active"] .xb-step-dot { color: #2b2118; }
+.xb-card { margin-bottom: 16px; }
+.xb-state, .xb-summary, .xb-list, .pv-article { border-radius: 12px; }
+:root[data-theme="dark"] .pv-article { border-color: var(--xb-outline); }
+@media (max-width: 380px) {
+  .topbar { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .topbar-actions { justify-content: flex-start; }
+  .shell { padding-inline: 10px; }
+  .xb-card { margin-inline: 8px; padding: 10px; }
+  .xb-actions { gap: 10px; }
+  .xb-btn { max-width: 100%; white-space: normal; padding-block: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary, .secondary, .xb-btn { transition: none; }
+}

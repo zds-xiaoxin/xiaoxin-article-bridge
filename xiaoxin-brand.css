@@ -1,0 +1,51 @@
+/* Shared Xiaoxin identity: paper, ink, orange, and a solid downward shadow. */
+:root {
+  color-scheme: light;
+  --paper: #fffdf8;
+  --paper-2: #fff3e4;
+  --ink: #2b2118;
+  --muted: #756354;
+  --line: #d9c9b7;
+  --signal: #ff6b3d;
+  --signal-text: #b83b17;
+  --signal-ink: #2b2118;
+  --accent: #ff6b3d;
+  --ok: #246e48;
+  --warn: #925300;
+  --danger: #b63028;
+  --button-fill: #ff6b3d;
+  --button-ink: #2b2118;
+  --xb-outline: #2b2118;
+  --xb-radius: 20px;
+  --xb-border: 2px solid var(--xb-outline);
+  --xb-shadow: 0 6px 0 var(--xb-outline);
+  --xb-shadow-sm: 0 3px 0 var(--xb-outline);
+  --shadow: var(--xb-shadow);
+  --xb-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --draft-content-font: var(--xb-font);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #241e19;
+  --paper-2: #332a22;
+  --ink: #fff3e4;
+  --muted: #c8b4a0;
+  --line: #6d5948;
+  --signal: #ff6b3d;
+  --signal-text: #ffa07f;
+  --signal-ink: #2b2118;
+  --accent: #ff6b3d;
+  --ok: #8dd4a7;
+  --warn: #f4c474;
+  --danger: #ff9a8e;
+  --button-fill: #ff6b3d;
+  --button-ink: #2b2118;
+  --xb-outline: #bca28a;
+  --xb-shadow: 0 6px 0 #100d0a;
+  --xb-shadow-sm: 0 3px 0 #100d0a;
+}
+
+body { font-family: var(--xb-font); }
+button, input, select, textarea { font: inherit; }
+:focus-visible { outline: 3px solid var(--signal-text); outline-offset: 3px; }

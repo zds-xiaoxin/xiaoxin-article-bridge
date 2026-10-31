@@ -1,7 +1,7 @@
 # 隐私政策
 
-产品：Xiaoxin Article Bridge（小新文章桥）。生效日期：2026-10-31（1.1.0 版；上一版 2026-09-21）。
-维护者：GitHub 用户 labixiaoxins。[联系入口](https://github.com/labixiaoxins/xiaoxin-article-bridge/issues)，请勿公开提交私人文章、客户资料、Cookie 或令牌。
+产品：Xiaoxin Article Bridge（小新文章桥）。生效日期：2026-11-01（1.2.0 版；上一版 2026-10-31）。
+维护者：GitHub 用户 zds-xiaoxin。[联系入口](https://github.com/zds-xiaoxin/xiaoxin-article-bridge/issues)，请勿公开提交私人文章、客户资料、Cookie 或令牌。
 
 唯一用途是将用户选择的 Markdown 和配图导入 X Articles 草稿。插件读取选入的文章、文件以及相关 X 标签页地址和编辑器状态。草稿、设置、导入历史和诊断记录保存在本机 Chrome 扩展存储中。原有文件夹授权流程可能在 IndexedDB 保存目录句柄。1.1 的文章文件夹流程会在扩展自己的 IndexedDB 中保存“上次选择的文件夹”这一个目录句柄，以便下次继续；它是浏览器管理的引用，不是文件副本，读取权限由 Chrome 控制。可在文章卡片点“忘记”或删除扩展本地数据来清除。选中文件的引用、本地压缩后的图片副本和预览图只保存在当前侧栏会话的内存中，关闭侧栏即释放。图片压缩和预览全部在侧栏本地完成，预览只显示本地图片，不请求远程图片。
 

@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Xiaoxin Article Bridge",
   "description": "Import Markdown folders and local images into X Articles drafts. Check, compress and preview first; never auto-publishes.",
-  "version": "1.1.0",
-  "homepage_url": "https://github.com/labixiaoxins/xiaoxin-article-bridge",
+  "version": "1.2.0",
+  "homepage_url": "https://github.com/zds-xiaoxin/xiaoxin-article-bridge",
   "default_locale": "en",
   "minimum_chrome_version": "116",
   "action": {

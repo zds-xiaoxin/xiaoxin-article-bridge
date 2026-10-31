@@ -1,4 +1,5 @@
 const STORAGE_LANGUAGE = "xposter_language";
+const STORAGE_THEME = "xposter_theme";
 const COPY_FEEDBACK_MS = 1000;
 const i18n = window.xPosterI18n;
 
@@ -22,7 +23,7 @@ const els = {
 
 const TEXT = {
   en: {
-    documentTitle: "xPoster Status",
+    documentTitle: "Xiaoxin Article Bridge · Status",
     heading: "Status check",
     run: "Check this tab",
     checking: "Checking...",
@@ -35,15 +36,15 @@ const TEXT = {
     unavailable: "Unavailable",
     summaryTarget: "Page",
     summaryRoute: "X Article",
-    summaryContent: "xPoster link",
+    summaryContent: "Bridge connection",
     summaryMain: "Page access",
     summaryEditor: "Editor",
     summaryUpload: "Images",
     summaryArticle: "Article",
     summaryDraft: "Draft text",
     summaryVault: "Local images",
-    idle: "Open an X Article tab, then check whether xPoster can write into it.",
-    extensionOnly: "Load xPoster as a Chrome extension to check the active X tab.",
+    idle: "Open an X Article tab, then check whether Article Bridge can write into it.",
+    extensionOnly: "Load Article Bridge as a Chrome extension to check the active X tab.",
     statusXOpen: "X is open",
     statusOpenX: "Open X",
     statusEditing: "Editing",
@@ -67,7 +68,7 @@ const TEXT = {
     chars: "{count} chars",
     gatePage: "Current page",
     gateRoute: "X Articles",
-    gateConnection: "xPoster connection",
+    gateConnection: "Bridge connection",
     gateEditor: "Write target",
     gateExisting: "Article content",
     gateUpload: "Image upload",
@@ -76,9 +77,9 @@ const TEXT = {
     gatePageFix: "Open x.com, then check again.",
     gateRouteOk: "X Articles is open.",
     gateRouteFix: "Open the X Articles composer or article list.",
-    gateConnectionOk: "xPoster can reach this page.",
+    gateConnectionOk: "Article Bridge can reach this page.",
     gateConnectionFix: "Reload the X tab, then check again.",
-    gateEditorOk: "xPoster can write into the open editor.",
+    gateEditorOk: "Article Bridge can write into the open editor.",
     gateEditorArticleList: "Open or create an article draft before writing.",
     gateEditorFix: "Open an X Article draft before writing.",
     gateExistingOk: "The editor is empty.",
@@ -93,7 +94,7 @@ const TEXT = {
     errorPrefix: "Could not check this tab: {error}"
   },
   zh: {
-    documentTitle: "xPoster 状态",
+    documentTitle: "小新文章桥 · 状态",
     heading: "状态检查",
     run: "检查当前页面",
     checking: "检查中...",
@@ -106,15 +107,15 @@ const TEXT = {
     unavailable: "不可用",
     summaryTarget: "页面",
     summaryRoute: "X 文章",
-    summaryContent: "xPoster 连接",
+    summaryContent: "文章桥连接",
     summaryMain: "页面权限",
     summaryEditor: "编辑器",
     summaryUpload: "图片",
     summaryArticle: "文章",
     summaryDraft: "草稿内容",
     summaryVault: "本地图片",
-    idle: "打开 X 文章页面后，检查 xPoster 是否可以写入。",
-    extensionOnly: "请先把 xPoster 作为 Chrome 扩展加载，才能检查当前 X 页面。",
+    idle: "打开 X 文章页面后，检查文章桥是否可以写入。",
+    extensionOnly: "请先把文章桥作为 Chrome 扩展加载，才能检查当前 X 页面。",
     statusXOpen: "已打开 X",
     statusOpenX: "请打开 X",
     statusEditing: "正在编辑",
@@ -138,7 +139,7 @@ const TEXT = {
     chars: "{count} 字",
     gatePage: "当前页面",
     gateRoute: "X 文章",
-    gateConnection: "xPoster 连接",
+    gateConnection: "文章桥连接",
     gateEditor: "写入目标",
     gateExisting: "文章内容",
     gateUpload: "图片上传",
@@ -147,9 +148,9 @@ const TEXT = {
     gatePageFix: "先打开 x.com，然后再检查。",
     gateRouteOk: "X 文章页面已打开。",
     gateRouteFix: "打开 X 文章编辑器或文章列表。",
-    gateConnectionOk: "xPoster 可以访问这个页面。",
+    gateConnectionOk: "文章桥可以访问这个页面。",
     gateConnectionFix: "刷新 X 标签页后再检查。",
-    gateEditorOk: "xPoster 可以写入当前编辑器。",
+    gateEditorOk: "文章桥可以写入当前编辑器。",
     gateEditorArticleList: "写入前请打开或新建一篇文章草稿。",
     gateEditorFix: "写入前请先打开 X 文章草稿。",
     gateExistingOk: "编辑器当前是空的。",
@@ -466,8 +467,9 @@ function bindEvents() {
 
   if (hasChromeStorage() && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName !== "local" || !changes[STORAGE_LANGUAGE]) return;
-      setLanguage(changes[STORAGE_LANGUAGE].newValue || "auto");
+      if (areaName !== "local") return;
+      if (changes[STORAGE_THEME]) applyTheme(changes[STORAGE_THEME].newValue);
+      if (changes[STORAGE_LANGUAGE]) setLanguage(changes[STORAGE_LANGUAGE].newValue || "auto");
     });
   }
   window.addEventListener("xposter:i18n-language", (event) => {
@@ -476,7 +478,19 @@ function bindEvents() {
   });
 }
 
+const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+let themeMode = "system";
+function applyTheme(mode) {
+  themeMode = ["light", "dark"].includes(mode) ? mode : "system";
+  document.documentElement.dataset.theme = themeMode === "system" ? (themeMedia.matches ? "dark" : "light") : themeMode;
+}
+themeMedia.addEventListener("change", () => applyTheme(themeMode));
+
 async function init() {
+  try {
+    const stored = hasChromeStorage() ? await chrome.storage.local.get(STORAGE_THEME) : {};
+    applyTheme(stored[STORAGE_THEME]);
+  } catch { applyTheme("system"); }
   bindEvents();
   await restoreLanguage();
   await runDiagnostics();

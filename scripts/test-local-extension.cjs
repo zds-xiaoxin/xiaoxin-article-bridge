@@ -260,16 +260,55 @@ const rowsWithStatus = (page, status) => page.locator(`#xbList li[data-status="$
     });
     await page.screenshot({ path: path.join(storeDir, 'screenshot-3-table-1280x800.png'), scale: 'css' });
 
-    // Small sidebar and dark theme: the card remains usable without horizontal clipping.
-    for (const width of [320, 360, 420]) {
-      await page.setViewportSize({ width, height: 900 });
-      await page.evaluate(() => { document.documentElement.scrollTop = 0; });
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `no horizontal overflow at ${width}`);
-      if (width === 320) await shot('after-compact.png');
+    // Real settings persist the shared palette; both UI surfaces must fit narrow sidebars.
+    const diagnostics = await context.newPage();
+    diagnostics.on('pageerror', (error) => errors.push(error.message));
+    await diagnostics.goto(`chrome-extension://${id}/diagnostics.html`);
+    const assertFits = async (target, label) => {
+      assert.equal(await target.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${label}: no horizontal overflow`);
+      const clipped = await target.locator('button:visible').evaluateAll((nodes) => nodes.filter((node) => {
+        const r = node.getBoundingClientRect();
+        return r.left < 0 || r.right > innerWidth + 1 || node.scrollWidth > node.clientWidth + 1;
+      }).map((node) => node.id || node.textContent.trim()));
+      assert.deepEqual(clipped, [], `${label}: buttons remain fully readable`);
+    };
+    result.visualMatrix = [];
+    for (const theme of ['light', 'dark']) {
+      await page.locator('.tab[data-tab="settings"]').click();
+      await page.locator(`label:has(input[name="themeMode"][value="${theme}"])`).click();
+      await page.locator('.tab[data-tab="draft"]').click();
+      await diagnostics.waitForFunction((theme) => document.documentElement.dataset.theme === theme, theme);
+      const expected = theme === 'light' ? 'rgb(255, 253, 248)' : 'rgb(36, 30, 25)';
+      assert.equal(await page.locator('.composer').evaluate((node) => getComputedStyle(node).backgroundColor), expected);
+      assert.equal(await diagnostics.locator('body').evaluate((node) => getComputedStyle(node).backgroundColor), expected);
+      for (const width of [320, 360, 420]) {
+        await page.setViewportSize({ width, height: 900 });
+        await diagnostics.setViewportSize({ width, height: 900 });
+        await page.evaluate(() => { document.documentElement.scrollTop = 0; });
+        for (const section of ['draft', 'records', 'settings']) {
+          await page.locator(`.tab[data-tab="${section}"]`).click();
+          await assertFits(page, `${theme}/${width}/${section}`);
+        }
+        await page.locator('.tab[data-tab="draft"]').click();
+        await assertFits(diagnostics, `${theme}/${width}/diagnostics`);
+        await shot(`panel-${theme}-${width}.png`);
+        await diagnostics.screenshot({ path: path.join(output, `diagnostics-${theme}-${width}.png`) });
+        result.visualMatrix.push({ theme, width, sections: ['draft', 'records', 'settings', 'diagnostics'], fits: true });
+      }
     }
-    await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
-    await page.waitForFunction(() => getComputedStyle(document.querySelector('.composer')).backgroundColor === 'rgb(18, 26, 34)');
     await shot('after-dark.png');
+    // System mode resolves OS appearance, and stays synchronized across open surfaces.
+    await page.locator('.tab[data-tab="settings"]').click();
+    await page.locator('label:has(input[name="themeMode"][value="system"])').click();
+    for (const colorScheme of ['light', 'dark']) {
+      await page.emulateMedia({ colorScheme });
+      await diagnostics.emulateMedia({ colorScheme });
+      await page.waitForFunction((theme) => document.documentElement.dataset.theme === theme, colorScheme);
+      await diagnostics.waitForFunction((theme) => document.documentElement.dataset.theme === theme, colorScheme);
+    }
+    result.systemThemeSynced = true;
+    await diagnostics.close();
+    await page.locator('.tab[data-tab="draft"]').click();
     result.sidebarWidths = [320, 360, 420];
 
     // Writing needs a logged-in X Articles tab; stop here.

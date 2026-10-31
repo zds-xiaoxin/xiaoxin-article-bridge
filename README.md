@@ -2,7 +2,7 @@
 
 Import a Markdown article folder with local images into X Articles drafts. Check assets, compress oversized images locally and preview the result before writing. The title and cover already set in X are preserved by default, and nothing is ever published automatically.
 
-[中文](README.zh-CN.md) | [Privacy](docs/privacy.md) | [Usage](docs/usage.md) | [Releases](https://github.com/labixiaoxins/xiaoxin-article-bridge/releases)
+[中文](README.zh-CN.md) | [Privacy](docs/privacy.md) | [Usage](docs/usage.md) | [Releases](https://github.com/zds-xiaoxin/xiaoxin-article-bridge/releases)
 
 Chrome Web Store status: **Not yet published**. No official store listing for this fork exists yet.
 
@@ -20,7 +20,17 @@ A free, open-source Chrome Manifest V3 extension for writers who prepare Markdow
 
 A single root article.md wins over other Markdown files; otherwise only one Markdown file may be present. Relative paths are resolved from the article directory.
 
-## New in 1.1
+## New in 1.2
+
+A consistent Xiaoxin identity across the side panel and diagnostics: warm paper, ink outlines, orange actions, rounded cards and solid downward shadows. Light and warm dark themes work across 320/360/420px sidebars. New article/bridge/star icons replace the inherited launcher artwork; upstream credits remain intact. See [brand assets](docs/brand/README.md) and the [changelog](CHANGELOG.md).
+
+![v1.2 light sidebar with public fixture](docs/images/v1.2-panel-light.png)
+![v1.2 warm dark sidebar with public fixture](docs/images/v1.2-panel-dark.png)
+![v1.2 status check](docs/images/v1.2-diagnostics.png)
+
+These are real isolated-browser captures with public synthetic fixtures. They do not show an authenticated X upload. The owner still needs to verify saving a real X draft; no article is published automatically.
+
+## Features added in 1.1
 
 - **Remember the last folder.** The folder is stored as a File System Access handle in the extension's IndexedDB. After reopening the side panel, click “Continue last folder”; Chrome may ask to re-grant read access. “Forget” removes it.
 - **Local compression of oversized images.** When an image exceeds 5 MiB or referenced images exceed 24 MiB in total, images are re-encoded locally with OffscreenCanvas (aspect ratio kept, long edge at most 4096 px, WebP when transparent, otherwise JPEG, decreasing quality). Sizes before and after are shown. Original files are never modified; compressed copies live in memory only. GIFs are not compressed (animation would be lost); oversized GIFs get a warning.
@@ -58,4 +68,4 @@ X editor changes may break import. Keep backups and check every imported draft. 
 
 ## Support
 
-[Issues](https://github.com/labixiaoxins/xiaoxin-article-bridge/issues). Do not attach private drafts, client screenshots, cookies or tokens. MIT licensed; upstream copyright notices are retained.
+[Issues](https://github.com/zds-xiaoxin/xiaoxin-article-bridge/issues). Do not attach private drafts, client screenshots, cookies or tokens. MIT licensed; upstream copyright notices are retained.
